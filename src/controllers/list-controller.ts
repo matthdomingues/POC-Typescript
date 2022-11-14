@@ -50,7 +50,7 @@ export async function DeleteItem(req: Request, res: Response) {
 // deleta lista de compras
 export async function DeleteList(req: Request, res: Response) {
     await deleteList();
-    return res.status(204).send('Shopping List deleted. Please, make a new one soon!')
+    return res.status(204);
 };
 
 // filtrar lista de compras por nome de itens
