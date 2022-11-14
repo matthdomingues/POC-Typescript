@@ -21,6 +21,10 @@ The **postgres database** already have a few itens for us to test it;
 
 First you need to create and import the database using the data inside the `dump.sql` file.
 
+```
+psql dbname < dumpfile
+```
+
 After that, execute this command: 
 
 ```bash
