@@ -1,9 +1,9 @@
 import { QueryResult } from "pg";
 import { connection } from '../database/database.js';
-import { List, ListEntity, ParamsId, UpdateList } from '../protocols/List.js';
+import { List, ListEntity } from '../protocols/List.js';
 
 export async function returnAll(): Promise<QueryResult<ListEntity>> {
-    return connection.query('SELECT * FROM List;')
+    return connection.query('SELECT * FROM List ORDER BY item;')
 }
 
 export async function insertOne(newItem: List) {
@@ -16,24 +16,30 @@ export async function insertOne(newItem: List) {
         ($1, $2, $3);`, [item, unidade, descrição]);
 }
 
-export async function updateItem(itemData: UpdateList, itemId: ParamsId) {
-    const { item, unidade, descrição } = itemData;
+export async function updateItem(itemData: Partial<List>, id: string) {
+    const { item, unidade, descrição, comprado } = itemData;
 
-    if (item.length !== 0) { connection.query(`UPDATE List SET item=$1 WHERE id = $2;`, [item, itemId]) };
-    if (unidade !== 0) { connection.query(`UPDATE List SET unidade=$1 WHERE id = $2;`, [unidade, itemId]) }
-    if (descrição.length !== 0) { connection.query(`UPDATE List SET descrição=$1 WHERE id = $2;`, [descrição, itemId]) }
+    if (item !== undefined) { connection.query(`UPDATE List SET item=$1 WHERE id = $2;`, [item, id]) };
+    if (unidade !== undefined) { connection.query(`UPDATE List SET unidade=$1 WHERE id = $2;`, [unidade, id]) }
+    if (descrição !== undefined) { connection.query(`UPDATE List SET descrição=$1 WHERE id = $2;`, [descrição, id]) }
+    if (comprado !== undefined) { connection.query(`UPDATE List SET comprado=$1 WHERE id = $2;`, [comprado, id]) }
+    return
 }
 
-export async function existingItem(id: ParamsId): Promise<QueryResult<ListEntity>> {
-    return connection.query('SELECT * FROM List WHERE id = ($1);', [id])
+export async function existingItem(id: string): Promise<QueryResult<ListEntity>> {
+    return connection.query('SELECT FROM List WHERE id = ($1);', [id])
 }
 
-export async function deleteItem(id: ParamsId) {
-    return connection.query('DELETE * FROM List WHERE id = ($1);', [id])
+export async function deleteItem(id: string) {
+    return connection.query('DELETE FROM List WHERE id = ($1);', [id])
 }
 
 export async function deleteList() {
     return connection.query('DELETE * FROM List');
+}
+
+export async function nameList(char: string): Promise<QueryResult<ListEntity>> {
+    return connection.query(`SELECT * FROM List WHERE item iLIKE '${char}%';`)
 }
 
 export async function countList(): Promise<QueryResult<Number>> {
